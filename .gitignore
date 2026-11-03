@@ -7,3 +7,5 @@ application-local.properties
 
 database/
 .vscode/
+
+uploads/
