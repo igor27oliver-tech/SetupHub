@@ -1,0 +1,16 @@
+ post /registerNewFilme
+// parametros do request body: tamanhoDoFilme, espessuraDoFilme, kgh, VelocidadeDeRosca, VelocidadeDeArraste, Temperatura, Resina, descricaoDoSetup, dataDeCadastro
+        
+ get /seeAllFilmes
+ retorna todos os filmes cadastrados no banco de dados, com os parametros: id, tamanhoDoFilme, espessuraDoFilme, kgh, VelocidadeDeRosca, VelocidadeDeArraste, Temperatura, Resina, descricaoDoSetup, dataDeCadastro
+
+
+ 
+
+
+
+
+
+
+
+
