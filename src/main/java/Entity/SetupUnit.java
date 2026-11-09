@@ -40,7 +40,7 @@ public class SetupUnit {
 
 
     @Convert(converter = FormulacaoConverter.class)
-    @Column(columnDefinition = "CLOB")
+    @Column(columnDefinition = "LONGTEXT")
     private Formulacao formulacao;
 
 }

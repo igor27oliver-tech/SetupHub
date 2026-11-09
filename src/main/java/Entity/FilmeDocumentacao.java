@@ -20,7 +20,7 @@ public class FilmeDocumentacao {
     @JoinColumn(name = "filme_id", unique = true)
     private Filme filme;
 
-    @Lob
+    @Column(columnDefinition = "LONGTEXT")
     private String conteudo;
 
     private String atualizadoPor;
