@@ -16,6 +16,7 @@ public class FilmeMapper {
         RegisterMapper mapper;
     private final SetupUnitMapper setupUnitMapper;
     private final FeedBackMapper feedBackMapper;
+
 //    private final PictureMapper pictureMapper;
 
     public FilmeResponse toResponse(Filme filme) {
@@ -28,15 +29,22 @@ public class FilmeMapper {
         response.setCodigoMaterial(filme.getCodigoMaterial());
         response.setFeedBack(feedBackMapper.toResponseList(filme.getFeedBack()));
         response.setTags(mapper.toResponseTags(filme.getTagsFilters()));
+        response.setMaquina(filme.getMaquina());
 
 
         List<ImagemResponse> imagens = filme.getImagens().stream()
                 .map(i -> new ImagemResponse(i.getId(), "/imagem/" + i.getId(),
-                        i.getNomeOperador(), i.getDescricao(), i.getDataUpload()))
+                        i.getNomeOperador(), i.getDescricao(), i.getDataUpload(), i.getSetup() == null ? null : i.getSetup().getId()))
                 .toList();
         response.setImagens(imagens);
+        response.setImagens(
+                filme.getImagens().stream()
+                        .filter(i -> i.getSetup() == null)      // <- só as que não são de setup
+                        .map(setupUnitMapper::toResponseImagem)
+                        .toList());
 
-//        response.setPicture(pictureMapper.toResponse(filme.getPictures()));
+
+
         return response;
     }
 

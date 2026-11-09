@@ -91,10 +91,11 @@ public class ClientControll {
 
     @PostMapping(value = "/addImagem", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ImagemResponse addImagem(@RequestParam Long idFilme,
+                                    @RequestParam(required = false) Long idSetup,
                                     @RequestParam String nomeOperador,
                                     @RequestParam(required = false) String descricao,
                                     @RequestParam("file") MultipartFile file) throws IOException {
-        return imagemService.salvar(idFilme, nomeOperador, descricao, file);
+        return imagemService.salvar(idFilme,idSetup, nomeOperador, descricao, file);
     }
 
     @GetMapping("/imagem/{id}")

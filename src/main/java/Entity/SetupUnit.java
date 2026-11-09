@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -17,7 +19,6 @@ public class SetupUnit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
- private  String img;
  private String nome;
  private String descrition;
   private  String kgh;
@@ -26,9 +27,17 @@ public class SetupUnit {
   private  String Temperatura;
    private String descricaoDoSetup;
  private  LocalDateTime dataDeCadastro;
+
+
+
     @ManyToOne
     @JoinColumn(name = "filme_id")
     private Filme filme;
+
+    @OneToMany(mappedBy = "setup", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FilmeImagem> imagens = new ArrayList<>();
+
+
 
     @Convert(converter = FormulacaoConverter.class)
     @Column(columnDefinition = "CLOB")

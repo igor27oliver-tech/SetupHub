@@ -3,6 +3,8 @@ package DTO;
 import Entity.Formulacao;
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -16,6 +18,7 @@ public class SetupUnitResponse {
     private String temperatura;
     private Formulacao  formulacao;
     private String descricaoDoSetup;
+    private List<ImagemResponse> imagens;
 
 
 }

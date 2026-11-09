@@ -42,6 +42,7 @@ public class RegisterNewFilme {
         filme.setLarguraDoFilme(registerNewFilmeDTO.tamanho());
         filme.setComentarioDoFilme(registerNewFilmeDTO.comentarioDoFilme());
         filme.setCodigoMaterial(registerNewFilmeDTO.codigoFilme());
+        filme.setMaquina(registerNewFilmeDTO.maquina());
 
         List<TagsFilter> tags = new ArrayList<>();
         if (registerNewFilmeDTO.list() != null) {

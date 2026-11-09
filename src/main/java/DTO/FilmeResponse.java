@@ -22,6 +22,7 @@ public class FilmeResponse {
     private String codigoMaterial;
     private List<TagResponse> tags;
     List<ImagemResponse> imagens;
+    Integer maquina;
 }
 //filme.setLarguraDoFilme(registerRequest.tamanhoDoFilme());
 //        filme.setEspessuraDoFilme(registerRequest.espessuraDoFilme());

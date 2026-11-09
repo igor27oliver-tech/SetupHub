@@ -5,9 +5,11 @@ package Service;
 import DTO.ImagemResponse;
 import Entity.Filme;
 import Entity.FilmeImagem;
+import Entity.SetupUnit;
 import Repository.FilmeImagemRepository;
 import Repository.RegistersDeFilmes;
 
+import Repository.SetupUnitRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
@@ -42,9 +44,12 @@ public class ImagemService {
     @Autowired
     private FilmeImagemRepository imagemRepository;
     @Autowired private RegistersDeFilmes registersDeFilmes;
+    @Autowired
+    SetupUnitRepository setupRepository;
+
 
     @Transactional
-    public ImagemResponse salvar(Long idFilme, String nomeOperador, String descricao, MultipartFile file) throws IOException {
+    public ImagemResponse salvar(Long idFilme, Long idSetup,String nomeOperador, String descricao, MultipartFile file) throws IOException {
         Filme filme = registersDeFilmes.findById(idFilme)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Filme não encontrado: " + idFilme));
 
@@ -54,13 +59,23 @@ public class ImagemService {
         if (ext == null)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Use JPG, PNG ou WEBP");
 
+        SetupUnit setup = null;
+        if (idSetup != null) {
+            setup = setupRepository.findById(idSetup)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Setup não encontrado"));
+            if (!setup.getFilme().getId().equals(idFilme))
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O setup não pertence a este filme");
+        }
+
         Path dir = Paths.get(uploadDir).toAbsolutePath().normalize();
         Files.createDirectories(dir);
         String nomeArquivo = UUID.randomUUID() + ext;      // nunca usa o nome enviado pelo usuário
         Files.copy(file.getInputStream(), dir.resolve(nomeArquivo));
 
         FilmeImagem img = new FilmeImagem();
+
         img.setFilme(filme);
+        img.setSetup(setup);
         img.setNomeArquivo(nomeArquivo);
         img.setNomeOriginal(file.getOriginalFilename());
         img.setContentType(file.getContentType());
@@ -89,6 +104,6 @@ public class ImagemService {
     }
 
     private ImagemResponse toResponse(FilmeImagem i) {
-        return new ImagemResponse(i.getId(), "/imagem/" + i.getId(), i.getNomeOperador(), i.getDescricao(), i.getDataUpload());
+        return new ImagemResponse(i.getId(), "/imagem/" + i.getId(), i.getNomeOperador(), i.getDescricao(), i.getDataUpload(), i.getSetup() == null ? null : i.getSetup().getId());
     }
 }

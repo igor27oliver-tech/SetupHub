@@ -26,6 +26,8 @@ public class Filme {
     String EspessuraDoFilme;
     String ComentarioDoFilme;
     String codigoMaterial;
+    Integer maquina;
+
 
 
 
@@ -54,5 +56,4 @@ public class Filme {
 
     @OneToOne(mappedBy = "filme", cascade = CascadeType.ALL, orphanRemoval = true)
     private FilmeDocumentacao documentacao;
-
 }

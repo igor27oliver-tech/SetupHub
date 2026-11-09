@@ -26,6 +26,11 @@ public class FilmeImagem {
     @Column(nullable = false)
     private String contentType;
 
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "setup_id")       // pode ser nulo: sem setup = imagem do filme
+    private SetupUnit setup;
+
     private String nomeOperador;     // quem fez o upload
     @Column(length = 300)
     private String descricao;
