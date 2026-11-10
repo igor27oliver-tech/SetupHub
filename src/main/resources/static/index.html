@@ -34,7 +34,12 @@ main{display:grid;grid-template-columns:340px 1fr;min-height:calc(100vh - 67px)}
 .filme-card.active{border-left-color:var(--amber);border-color:var(--amber-dim);background:var(--panel-2)}
 .filme-card .dims{font-family:var(--mono);font-size:15px;color:var(--amber)}
 .filme-card .dims small{color:var(--text-dim);font-size:11px}
-.filme-card .coment{font-size:12.5px;color:var(--text-dim);line-height:1.4}
+.filme-card .coment{font-size:12.5px;color:var(--text-dim);line-height:1.4;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.filme-card{padding:9px 12px;gap:3px}
+.filme-card .tag-pills{flex-wrap:nowrap;overflow:hidden}
+[hidden]{display:none!important}
+.more-btn{width:100%;margin-top:4px;font-size:11px;padding:7px}
+.more-btn.inline{width:auto;margin-top:10px}
 .filme-card .meta{font-family:var(--mono);font-size:10.5px;color:var(--text-dim)}
 button{font-family:var(--sans);font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;background:var(--panel-2);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:9px 13px;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 1px 0 rgba(0,0,0,.4)}
 button:hover{border-color:var(--amber-dim)}
@@ -52,7 +57,12 @@ button:disabled{opacity:.5;cursor:wait}
 .detail-head{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid var(--border);padding-bottom:16px;margin-bottom:20px;gap:16px;position:relative}
 .detail-head::before{content:'';position:absolute;left:0;bottom:-2px;width:64px;height:2px;background:var(--amber)}
 .detail-head .dims{font-family:var(--mono);font-size:28px;color:var(--amber)}
-.detail-head .dims .unit{font-family:var(--sans);font-size:12px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.04em}
+.detail-head .dims .x{font-size:18px;color:var(--text-dim)}
+.detail-head .unit{font-family:var(--sans);font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;margin-top:-2px}
+.detail-head .codigo{font-family:var(--mono);font-size:20px;font-weight:700;color:var(--text);letter-spacing:.02em;word-break:break-word}
+.detail-head .head-info{min-width:0}
+.filme-card .card-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.filme-card .codigo{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .detail-head .coment{color:var(--text-dim);font-size:13.5px;margin-top:4px;max-width:60ch}
 .detail-head .id{font-family:var(--mono);font-size:11px;color:var(--text-dim);letter-spacing:.06em}
 .actions{display:flex;gap:8px;flex-wrap:wrap}
@@ -174,6 +184,20 @@ main.list-collapsed .col-list{cursor:pointer}
   .brand .tag{display:none}
   header{padding:0 14px}
   .status #statusText{display:none}
+  /* cabeçalho do filme: dados em cima, botões embaixo */
+  .detail-head{flex-direction:column;align-items:stretch;gap:14px}
+  .detail-head .actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .detail-head .actions #btnAddSetup{grid-column:1/-1;order:-1}
+  /* fonte de 16px nos campos evita o zoom automático do iPhone ao tocar */
+  .field input,.field textarea,.field select,.search input,.tp-new input{font-size:16px!important}
+  /* campos podem encolher, senão a fonte maior empurra o formulário para fora da tela */
+  .field{min-width:0}
+  .field input,.field textarea,.field select,.tp-new input{min-width:0;width:100%;box-sizing:border-box}
+  .resina-row{grid-template-columns:minmax(0,1fr) 64px 72px auto}
+  /* alvos de toque de pelo menos 44px */
+  button{min-height:44px}
+  .tag-chip,.tag-chip.on{min-height:36px}
+  .setup-foot button{padding:9px 12px;font-size:11px}
 }
 @media (max-width:520px){ .hide-sm{display:none} }
 .auto-chk{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10.5px;color:var(--text-dim);cursor:pointer}
@@ -210,7 +234,7 @@ main.list-collapsed .col-list{cursor:pointer}
 .setup-thumb.broken::after{content:'!';color:var(--red);font-family:var(--mono)}
 .thumb-del{position:absolute;top:-6px;right:-6px;width:18px;height:18px;padding:0;border-radius:50%;font-size:12px;line-height:1;background:#2c1512;color:#f08a7e;border:1px solid #71332b;box-shadow:none}
 .thumb-del:hover{border-color:var(--red)}
-.setup-foot{display:flex;justify-content:flex-end;margin-top:8px}
+.setup-foot{display:flex;justify-content:flex-end;gap:6px;margin-top:8px}
 .setup-foot button{padding:5px 9px;font-size:10.5px}
 
 /* ---------- câmera ---------- */
@@ -367,6 +391,8 @@ const API = {
   filterForID: (id) => fetch(API_BASE_URL+'/filterForID?idFilme='+encodeURIComponent(id)).then(handleJson),
   novoFilme: (b) => fetch(API_BASE_URL+'/novoFilme', post(b)).then(handleJson),
   addNewSetup: (b) => fetch(API_BASE_URL+'/addNewSetup', post(b)).then(handleJson),
+  editarFilme: (id, b) => fetch(API_BASE_URL+'/editarFilme?idFilme='+encodeURIComponent(id), { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(b) }).then(handleJson),
+  editarSetup: (id, b) => fetch(API_BASE_URL+'/editarSetup?idSetup='+encodeURIComponent(id), { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(b) }).then(handleJson),
   feedBack: (b) => fetch(API_BASE_URL+'/feedBack', post(b)).then(handleJson),
   deleteFilme: (id) => fetch(API_BASE_URL+'/deletFilme?idFilme='+encodeURIComponent(id), { method:'DELETE' }).then(handleJson),
   // ----- imagens (multipart: não definir Content-Type, o navegador coloca o boundary) -----
@@ -422,7 +448,8 @@ function focusDetail(){
   else window.scrollTo({top:0,behavior:'smooth'});
 }
 
-let busca='', maqFiltro=null;   // maqFiltro: '1' | '2' | '3' | null
+let busca='', maqFiltro=null;
+const PAGE=30; let listLimit=PAGE;   // quantos filmes aparecem na lista (aumenta com "Mostrar mais")   // maqFiltro: '1' | '2' | '3' | null
 const buscaEl=$('busca');
 const semAcento=(t)=>String(t??'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
 // "600x50" vira dois termos (600 e 50); todos os termos precisam aparecer no filme
@@ -448,7 +475,7 @@ const secClose=()=>'</div></section>';
 
 init();
 async function init(){
-  $('btnNovoFilme').addEventListener('click', renderNovoFilmeForm);
+  $('btnNovoFilme').addEventListener('click', ()=>renderNovoFilmeForm());
   atualizarAdminUI();
   $('btnAdmin').addEventListener('click',()=>{ if(isAdmin()) sairAdmin(); else abrirLogin(); });
   autoEl.checked=autoCollapse();
@@ -458,8 +485,8 @@ async function init(){
     if(mainEl.classList.contains('list-collapsed') && !e.target.closest('#btnToggleList')) setListCollapsed(false,true);
   });
   renderMaqFilter();
-  $('maqFilter').addEventListener('click',(e)=>{ const b=e.target.closest('[data-m]'); if(!b) return; maqFiltro = maqFiltro===b.dataset.m ? null : b.dataset.m; renderMaqFilter(); renderFilmeList(); });
-  buscaEl.addEventListener('input',()=>{ busca=buscaEl.value; renderFilmeList(); });
+  $('maqFilter').addEventListener('click',(e)=>{ const b=e.target.closest('[data-m]'); if(!b) return; maqFiltro = maqFiltro===b.dataset.m ? null : b.dataset.m; listLimit=PAGE; renderMaqFilter(); renderFilmeList(); });
+  buscaEl.addEventListener('input',()=>{ busca=buscaEl.value; listLimit=PAGE; renderFilmeList(); });
   buscaEl.addEventListener('keydown',(e)=>{ if(e.key==='Escape'){ buscaEl.value=''; busca=''; renderFilmeList(); } });
   btnList.addEventListener('click',()=>setListCollapsed(!mainEl.classList.contains('list-collapsed'),true));
   let savedColl=null; try{ savedColl=localStorage.getItem('ppg.listCollapsed'); }catch(e){}
@@ -491,7 +518,7 @@ async function loadTags(){
 
 /* ---------- abas ---------- */
 async function setTab(t){
-  tab=t;
+  tab=t; listLimit=PAGE;
   document.querySelectorAll('.tab').forEach(b=>b.setAttribute('aria-selected', String(b.dataset.tab===t)));
   tagBarWrap.hidden = t!=='tag';
   if(t==='tag'){ await loadTags(); renderTagBar(); }
@@ -506,6 +533,7 @@ function renderTagBar(){
 }
 
 async function selectTag(nome){
+  listLimit=PAGE;
   // clicar de novo na tag ativa limpa o filtro
   if(activeTag===nome){ activeTag=null; tagResults=[]; renderTagBar(); renderFilmeList(); return; }
   activeTag=nome; renderTagBar();
@@ -518,25 +546,37 @@ async function selectTag(nome){
 function renderFilmeList(){
   updateListTitle();
   const base = tab==='tag' ? tagResults : filmes, tokens = searchTokens();
-  const filtrando = !!(tokens.length||maqFiltro), src = filtrando ? base.filter(f=>matchFilme(f,tokens)) : base;
+  const filtrando = !!(tokens.length||maqFiltro);
+  // mais recentes primeiro
+  const src = (filtrando ? base.filter(f=>matchFilme(f,tokens)) : base).slice().sort((a,b)=>(b.id??0)-(a.id??0));
   listLabelEl.textContent = tab==='tag' ? (activeTag ? 'TAG: '+activeTag.toUpperCase() : 'FILTRO POR TAG') : 'FILMES CADASTRADOS';
   filmeCountEl.textContent = (tab==='tag' && !activeTag) ? '' : (filtrando ? src.length+'/'+base.length : (src.length || ''));
   if(tab==='tag' && !activeTag){ filmeListEl.innerHTML='<div class="empty">Escolha uma tag acima para filtrar os filmes.</div>'; return; }
   if(!src.length && filtrando && base.length){ filmeListEl.innerHTML=`<div class="empty">Nenhum filme encontrado${busca.trim()?` para “${esc(busca.trim())}”`:''}${maqFiltro?` na máquina ${esc(maqFiltro)}`:''}.</div>`; return; }
   if(!src.length){ filmeListEl.innerHTML = tab==='tag' ? `<div class="empty">Nenhum filme com a tag “${esc(activeTag)}”.</div>` : '<div class="empty">Nenhum filme cadastrado ainda.</div>'; return; }
   filmeListEl.innerHTML='';
-  src.forEach(f=>{
+  // o filme aberto sempre aparece, mesmo se estiver além do limite
+  const iAtivo=src.findIndex(f=>f.id===activeId), limite=Math.max(listLimit, iAtivo+1);
+  src.slice(0,limite).forEach(f=>{
     const nS=(f.listSetupUnits||[]).length, nF=getFeedbacks(f).length, tags=getTags(f);
     const card=document.createElement('button');
     card.className='filme-card'+(f.id===activeId?' active':'');
-    card.innerHTML=`<div class="meta">Código do filme: ${esc(f.codigoMaterial||'—')}${f.maquina!=null&&f.maquina!==''?` · <span class="maq-badge">Máq. ${esc(f.maquina)}</span>`:''}</div>
+    card.innerHTML=`<div class="card-top"><span class="codigo">${esc(f.codigoMaterial||'Sem código')}</span>${f.maquina!=null&&f.maquina!==''?`<span class="maq-badge">Máq. ${esc(f.maquina)}</span>`:''}</div>
       <div class="dims">${fmt(f.tamanhoDoFilme)} <small>×</small> ${fmt(f.espessuraDoFilme)}</div>
       <div class="coment">${esc(f.comentarioDoFilme||'Sem comentário')}</div>
-      ${tags.length?`<div class="tag-pills">${tags.map(t=>`<span class="tag-pill">${esc(t)}</span>`).join('')}</div>`:''}
+      ${tags.length?`<div class="tag-pills">${tags.slice(0,3).map(t=>`<span class="tag-pill">${esc(t)}</span>`).join('')}${tags.length>3?`<span class="tag-pill">+${tags.length-3}</span>`:''}</div>`:''}
       <div class="meta">#${f.id} · ${nS} setup${nS===1?'':'s'} · ${nF} comentário${nF===1?'':'s'}${getImages(f).length?` · ${getImages(f).length} img`:''}</div>`;
     card.addEventListener('click',()=>selectFilme(f.id,true));
     filmeListEl.appendChild(card);
   });
+  const resto=src.length-limite;
+  if(resto>0){
+    const b=document.createElement('button');
+    b.type='button'; b.className='ghost more-btn';
+    b.textContent=`Mostrar mais (${resto} restante${resto===1?'':'s'})`;
+    b.addEventListener('click',()=>{ listLimit=limite+PAGE; renderFilmeList(); });
+    filmeListEl.appendChild(b);
+  }
 }
 
 async function selectFilme(id, scroll=false){
@@ -598,19 +638,31 @@ function openLightbox(src, caption){
   document.body.appendChild(o);
 }
 
+// Adiciona "Ver todos (N)" abaixo de `area` quando há mais itens que o limite.
+// `itens` são os elementos já renderizados; os excedentes ficam escondidos até o clique.
+function limitarItens(area, itens, max, nome, aoMostrar){
+  if(itens.length<=max) return;
+  itens.slice(max).forEach(el=>el.hidden=true);
+  const b=document.createElement('button');
+  b.type='button'; b.className='ghost more-btn inline';
+  b.textContent=`Ver todos os ${itens.length} ${nome}`;
+  b.addEventListener('click',()=>{ itens.forEach(el=>el.hidden=false); b.remove(); if(aoMostrar) aoMostrar(); });
+  area.appendChild(b);
+}
 function renderDetail(filme){
   const setups=filme.listSetupUnits||[], feedbacks=getFeedbacks(filme), tags=getTags(filme);
   detailEl.innerHTML=`
     <div class="detail-head">
-      <div>
-        <div class="id">FILME #${filme.id}</div>
-        ${filme.codigoMaterial?`<div class="id">CÓDIGO DO FILME: ${esc(filme.codigoMaterial)}</div>`:''}
-        ${filme.maquina!=null&&filme.maquina!==''?`<div class="id">MÁQUINA: ${esc(filme.maquina)}</div>`:''}
-        <div class="dims">${fmt(filme.tamanhoDoFilme)} <span class="unit">largura</span> · ${fmt(filme.espessuraDoFilme)} <span class="unit">espessura</span></div>
+      <div class="head-info">
+        <div class="codigo">${esc(filme.codigoMaterial||'Sem código')}</div>
+        <div class="id">FILME #${filme.id}${filme.maquina!=null&&filme.maquina!==''?` · <span class="maq-badge">Máq. ${esc(filme.maquina)}</span>`:''}</div>
+        <div class="dims">${fmt(filme.tamanhoDoFilme)} <span class="x">×</span> ${fmt(filme.espessuraDoFilme)}</div>
+        <div class="unit">largura × espessura</div>
         <div class="coment">${esc(filme.comentarioDoFilme||'Sem comentário')}</div>
         ${tags.length?`<div class="tag-pills">${tags.map(t=>`<span class="tag-pill">${esc(t)}</span>`).join('')}</div>`:''}
       </div>
       <div class="actions">
+        ${isAdmin()?'<button class="ghost" id="btnEditFilme">Editar</button>':''}
         <button class="ghost" id="btnAddTag">+ Tag</button>
         <button class="ghost" id="btnAddImagem">+ Imagem</button>
         <button class="ghost" id="btnAddFeedback">+ Comentário</button>
@@ -630,7 +682,11 @@ function renderDetail(filme){
   }));
   const sa=$('setupsArea');
   if(!setups.length) sa.innerHTML='<div class="empty">Nenhum setup registrado para este filme ainda.</div>';
-  else{ const g=document.createElement('div'); g.className='setup-grid'; setups.forEach(s=>g.appendChild(setupCard(s,filme))); sa.appendChild(g); }
+  else{
+    const g=document.createElement('div'); g.className='setup-grid';
+    [...setups].sort((a,b)=>(b.id??0)-(a.id??0)).forEach(s=>g.appendChild(setupCard(s,filme)));   // mais recentes primeiro
+    sa.appendChild(g); limitarItens(sa,[...g.children],4,'setups');
+  }
   const fa=$('feedbackArea');
   if(!feedbacks.length) fa.innerHTML='<div class="empty">Nenhum comentário ainda. Seja o primeiro a comentar.</div>';
   else fa.innerHTML='<div class="feedback-list">'+[...feedbacks].reverse().map(fb=>`
@@ -638,6 +694,7 @@ function renderDetail(filme){
       <div class="fb-head"><span class="fb-user">${esc(fb.nomeUsuario||fb.NomeUsuario||'Anônimo')}</span><span class="fb-date">${fmtDate(fb.data)}</span></div>
       <div class="fb-body">${esc(fb.comentario||'')}</div>
     </div>`).join('')+'</div>';
+  if(feedbacks.length) limitarItens(fa,[...fa.querySelectorAll('.feedback-card')],5,'comentários');
   const ia=$('imagesArea'), imagens=filmeImages(filme);
   if(!imagens.length) ia.innerHTML='<div class="empty">Nenhuma imagem anexada a este filme ainda.</div>';
   else{
@@ -653,12 +710,16 @@ function renderDetail(filme){
         </figcaption>
       </figure>`).join('')+'</div>';
     ia.querySelectorAll('.img-thumb').forEach(b=>b.addEventListener('click',()=>openLightbox(b.dataset.src,b.dataset.cap)));
+    // baixa só as imagens visíveis; as escondidas carregam ao clicar em "Ver todas"
     // se a imagem não carregar, mostra o aviso (com o endereço) em vez de um quadro preto
-    ia.querySelectorAll('.img-thumb img').forEach(async im=>{
+    const carregarVisiveis=()=>ia.querySelectorAll('.img-card:not([hidden]) .img-thumb img:not([data-ok])').forEach(async im=>{
+      im.dataset.ok='1';
       const t=im.closest('.img-thumb'), u=im.dataset.u;
       try{ const b=await loadBlobUrl(u); im.src=b; t.dataset.src=b; }
       catch(err){ t.classList.add('broken'); t.title=u+' — '+err.message; im.remove(); }
     });
+    limitarItens(ia,[...ia.querySelectorAll('.img-card')],8,'imagens',carregarVisiveis);
+    carregarVisiveis();
     ia.querySelectorAll('.img-del').forEach(b=>b.addEventListener('click',async()=>{
       if(!confirm('Excluir esta imagem?')) return;
       b.disabled=true;
@@ -671,6 +732,7 @@ function renderDetail(filme){
   $('btnAddSetup').addEventListener('click',()=>renderNovoSetupForm(filme));
   $('btnAddFeedback').addEventListener('click',()=>renderFeedbackForm(filme));
   $('btnAddTag').addEventListener('click',()=>renderAddTagForm(filme));
+  if(isAdmin()) $('btnEditFilme').addEventListener('click',()=>renderNovoFilmeForm(filme));
   const btnDel=$('btnDeleteFilme');
   if(btnDel) btnDel.addEventListener('click',async(ev)=>{
     if(!confirm(`Tem certeza que deseja excluir o filme #${filme.id}?`)) return;
@@ -704,8 +766,9 @@ function setupCard(s, filme){
     ${r.length?`<div class="resinas">${r.map(x=>`<span class="resina-pill"><b>${esc(x.nomeResina)}</b> ${fmt(x.porcentagem)}% · lote ${fmt(x.lote)}</span>`).join('')}</div>`:''}
     <div class="desc">${esc(s.descricaoDoSetup||'Sem descrição')}</div>
     ${imgs.length?`<div class="setup-imgs">${imgs.map(im=>`<div class="setup-thumb-wrap"><button type="button" class="setup-thumb" data-u="${esc(imgUrl(im))}" data-cap="${esc(im.descricao||'')}" aria-label="Ampliar imagem"><img decoding="async" alt="${esc(im.descricao||'Imagem do setup')}"></button>${isAdmin()?`<button type="button" class="thumb-del" data-id="${esc(im.id)}" aria-label="Excluir imagem" title="Excluir imagem">×</button>`:''}</div>`).join('')}</div>`:''}
-    <div class="setup-foot"><button type="button" class="ghost btn-setup-img">+ Imagem</button></div>`;
+    <div class="setup-foot">${isAdmin()?'<button type="button" class="ghost btn-setup-edit">Editar</button>':''}<button type="button" class="ghost btn-setup-img">+ Imagem</button></div>`;
   el.querySelector('.btn-setup-img').addEventListener('click',()=>renderImagemForm(filme,s));
+  el.querySelector('.btn-setup-edit')?.addEventListener('click',()=>renderNovoSetupForm(filme,s));
   el.querySelectorAll('.setup-thumb').forEach(async b=>{
     const im=b.querySelector('img'), u=b.dataset.u;
     b.addEventListener('click',()=>{ if(b.dataset.src) openLightbox(b.dataset.src,b.dataset.cap); });
@@ -1093,14 +1156,21 @@ function renderFeedbackForm(filme){
   });
 }
 
-/* ---------- novo filme ---------- */
-async function renderNovoFilmeForm(){
-  activeId=null; renderFilmeList(); focusDetail();
+/* ---------- novo filme / editar filme ---------- */
+// Filme já cadastrado com o mesmo código na mesma máquina (ignora maiúsculas e espaços).
+function filmeRepetido(codigo, maquina, ignorarId){
+  const c=String(codigo||'').trim().toLowerCase();
+  return filmes.find(f=>f.id!==ignorarId && String(f.codigoMaterial||'').trim().toLowerCase()===c && String(f.maquina??'')===String(maquina??''));
+}
+async function renderNovoFilmeForm(edit=null){
+  if(!edit || edit.id==null) edit=null;   // só edita quando recebe um filme (evita tratar um evento de clique como filme)
+  if(!edit){ activeId=null; renderFilmeList(); }
+  focusDetail();
   await loadTags(); // garante a lista de tags atualizada
   detailEl.innerHTML=`
     <div class="panel riveted" style="max-width:560px">
       <form id="formNovoFilme">
-        <h4>Cadastrar novo filme</h4>
+        <h4>${edit?`Editar filme #${edit.id}`:'Cadastrar novo filme'}</h4>
         <div id="formMsg"></div>
         <div class="row2">
           <div class="field"><label>Código do filme</label><input name="codigoFilme" required></div>
@@ -1109,54 +1179,74 @@ async function renderNovoFilmeForm(){
           </div>
         </div>
         <div class="row2">
-          <div class="field"><label>Largura do filme</label><input name="tamanho" required></div>
-          <div class="field"><label>Espessura do filme</label><input name="espessuraFilme" required></div>
+          <div class="field"><label>Largura do filme</label><input name="tamanho" inputmode="decimal" required></div>
+          <div class="field"><label>Espessura do filme</label><input name="espessuraFilme" inputmode="decimal" required></div>
         </div>
         <div class="field"><label>Comentário</label><textarea name="comentarioDoFilme" rows="3"></textarea></div>
         <div class="field"><label>Tags</label><div id="tagPicker"></div></div>
         <div class="form-actions">
           <button type="button" class="ghost" id="cancelNovoFilme">Cancelar</button>
-          <button type="submit" class="primary">Cadastrar</button>
+          <button type="submit" class="primary">${edit?'Salvar alterações':'Cadastrar'}</button>
         </div>
       </form>
     </div>`;
-  const picker=makeTagPicker($('tagPicker'));
-  $('cancelNovoFilme').addEventListener('click',()=>{ detailEl.innerHTML='<div class="placeholder"><div class="big">/// nenhum filme selecionado</div><div>Escolha um filme na lista ao lado.</div></div>'; });
-  $('formNovoFilme').addEventListener('submit',async(ev)=>{
+  const form=$('formNovoFilme');
+  if(edit){
+    form.codigoFilme.value=edit.codigoMaterial||'';
+    form.maquina.value=edit.maquina??'';
+    form.tamanho.value=edit.tamanhoDoFilme||'';
+    form.espessuraFilme.value=edit.espessuraDoFilme||'';
+    form.comentarioDoFilme.value=edit.comentarioDoFilme||'';
+  }
+  const picker=makeTagPicker($('tagPicker'), edit?getTags(edit):[]);
+  $('cancelNovoFilme').addEventListener('click',()=>{
+    if(edit) selectFilme(edit.id);
+    else detailEl.innerHTML='<div class="placeholder"><div class="big">/// nenhum filme selecionado</div><div>Escolha um filme na lista ao lado.</div></div>';
+  });
+  form.addEventListener('submit',async(ev)=>{
     ev.preventDefault();
     const fd=new FormData(ev.target), msg=$('formMsg'), btn=ev.target.querySelector('[type=submit]');
+    const codigo=String(fd.get('codigoFilme')||'').trim(), maquina=Number(fd.get('maquina'));
+    const repetido=filmeRepetido(codigo, maquina, edit?edit.id:null);
+    if(repetido){
+      msg.innerHTML=`<div class="msg error">Já existe um filme com o código ${esc(codigo)} na máquina ${esc(maquina)} (filme #${repetido.id}). <button type="button" class="ghost" id="abrirRepetido">Abrir esse filme</button></div>`;
+      $('abrirRepetido').addEventListener('click',()=>selectFilme(repetido.id,true));
+      return;
+    }
     btn.disabled=true;
     try{
       // 1) cria as tags novas; 2) envia o filme com a lista completa de tags
       const nomes=await ensureTags(picker.get());
-      const novo=await API.novoFilme({
-        codigoFilme:fd.get('codigoFilme'), tamanho:fd.get('tamanho'), espessuraFilme:fd.get('espessuraFilme'),
-        comentarioDoFilme:fd.get('comentarioDoFilme'), maquina:Number(fd.get('maquina')),
+      const body={
+        codigoFilme:codigo, tamanho:fd.get('tamanho'), espessuraFilme:fd.get('espessuraFilme'),
+        comentarioDoFilme:fd.get('comentarioDoFilme'), maquina,
         list: nomes.map(n=>({ nameForTag:n }))
-      });
-      await loadFilmes(); selectFilme(novo.id,true);
+      };
+      const salvo = edit ? await API.editarFilme(edit.id, body) : await API.novoFilme(body);
+      await loadFilmes(); selectFilme(salvo.id,true);
+      if(edit) toast('Filme atualizado.');
     }catch(err){
-      msg.innerHTML=`<div class="msg error">Falha ao cadastrar: ${esc(err.message)}</div>`;
+      msg.innerHTML=`<div class="msg error">Falha ao ${edit?'salvar':'cadastrar'}: ${esc(err.message)}</div>`;
       btn.disabled=false;
     }
   });
 }
 
 /* ---------- novo setup ---------- */
-function renderNovoSetupForm(filme){
+function renderNovoSetupForm(filme, edit=null){
   detailEl.innerHTML=`
     <div class="panel riveted" style="max-width:600px">
       <form id="formNovoSetup">
-        <h4>Novo setup — filme #${filme.id} (${fmt(filme.tamanhoDoFilme)} × ${fmt(filme.espessuraDoFilme)})</h4>
+        <h4>${edit?`Editar setup #${edit.id}`:'Novo setup'} — filme #${filme.id} (${fmt(filme.tamanhoDoFilme)} × ${fmt(filme.espessuraDoFilme)})</h4>
         <div id="formMsg"></div>
         <div class="row2">
           <div class="field"><label>Operador</label><input name="nomeOperador" required></div>
-          <div class="field"><label>Data</label><input type="date" name="dataDeCadastro" required></div>
+          ${edit?'':'<div class="field"><label>Data</label><input type="date" name="dataDeCadastro" required></div>'}
         </div>
         <div class="row3">
-          <div class="field"><label>kg/h</label><input name="kgh" required></div>
-          <div class="field"><label>Vel. rosca</label><input name="velocidadeDeRosca" required></div>
-          <div class="field"><label>Vel. arraste</label><input name="velocidadeDeArraste" required></div>
+          <div class="field"><label>kg/h</label><input name="kgh" inputmode="decimal" required></div>
+          <div class="field"><label>Vel. rosca</label><input name="velocidadeDeRosca" inputmode="decimal" required></div>
+          <div class="field"><label>Vel. arraste</label><input name="velocidadeDeArraste" inputmode="decimal" required></div>
         </div>
         <div class="field" style="max-width:180px"><label>Temperatura</label><input name="temperatura" required></div>
         <div class="field">
@@ -1167,12 +1257,18 @@ function renderNovoSetupForm(filme){
         <div class="field"><label>Descrição do setup</label><textarea name="descricaoDoSetup" rows="3"></textarea></div>
         <div class="form-actions">
           <button type="button" class="ghost" id="cancelNovoSetup">Cancelar</button>
-          <button type="submit" class="primary">Salvar setup</button>
+          <button type="submit" class="primary">${edit?'Salvar alterações':'Salvar setup'}</button>
         </div>
       </form>
     </div>`;
-  addResinaRow();
-  $('addResina').addEventListener('click',addResinaRow);
+  const form=$('formNovoSetup');
+  if(edit){
+    ['kgh','velocidadeDeRosca','velocidadeDeArraste','temperatura','descricaoDoSetup'].forEach(k=>{ form[k].value=edit[k]??''; });
+    form.nomeOperador.value=edit.nome||'';
+    const rs=(edit.formulacao&&edit.formulacao.formulacao)||[];
+    if(rs.length) rs.forEach(r=>addResinaRow(r)); else addResinaRow();
+  } else addResinaRow();
+  $('addResina').addEventListener('click',()=>addResinaRow());
   $('cancelNovoSetup').addEventListener('click',()=>selectFilme(filme.id));
   $('formNovoSetup').addEventListener('submit',async(ev)=>{
     ev.preventDefault();
@@ -1181,25 +1277,34 @@ function renderNovoSetupForm(filme){
       const nome=row.querySelector('[data-f=nomeResina]').value, p=row.querySelector('[data-f=porcentagem]').value, l=row.querySelector('[data-f=lote]').value;
       if(nome) resinas.push({ nomeResina:nome, porcentagem:p?Number(p):null, lote:l?Number(l):null });
     });
+    const btn=ev.target.querySelector('[type=submit]');
+    btn.disabled=true;   // evita salvar o mesmo setup duas vezes com clique duplo
     try{
-      await API.addNewSetup({
+      const body={
         idFilme:filme.id, kgh:fd.get('kgh'), velocidadeDeRosca:fd.get('velocidadeDeRosca'),
         velocidadeDeArraste:fd.get('velocidadeDeArraste'), temperatura:fd.get('temperatura'),
         formulacao:{ formulacao:resinas }, descricaoDoSetup:fd.get('descricaoDoSetup'),
         dataDeCadastro:fd.get('dataDeCadastro'), nomeOperador:fd.get('nomeOperador')
-      });
+      };
+      if(edit) await API.editarSetup(edit.id, body); else await API.addNewSetup(body);
       await loadFilmes(); selectFilme(filme.id);
-    }catch(err){ msg.innerHTML=`<div class="msg error">Falha ao salvar setup: ${esc(err.message)}</div>`; }
+      if(edit) toast('Setup atualizado.');
+    }catch(err){ msg.innerHTML=`<div class="msg error">Falha ao salvar setup: ${esc(err.message)}</div>`; btn.disabled=false; }
   });
 }
 
-function addResinaRow(){
+function addResinaRow(r){
   const row=document.createElement('div'); row.className='resina-row';
   row.innerHTML=`
     <div class="field"><label>Resina</label><input data-f="nomeResina"></div>
-    <div class="field"><label>%</label><input data-f="porcentagem" type="number" step="any"></div>
-    <div class="field"><label>Lote</label><input data-f="lote" type="number"></div>
+    <div class="field"><label>%</label><input data-f="porcentagem" type="number" step="any" inputmode="decimal"></div>
+    <div class="field"><label>Lote</label><input data-f="lote" type="number" inputmode="numeric"></div>
     <button type="button" class="ghost" aria-label="Remover resina">×</button>`;
+  if(r && typeof r==='object'){
+    row.querySelector('[data-f=nomeResina]').value=r.nomeResina??'';
+    row.querySelector('[data-f=porcentagem]').value=r.porcentagem??'';
+    row.querySelector('[data-f=lote]').value=r.lote??'';
+  }
   row.querySelector('button').addEventListener('click',()=>row.remove());
   $('resinaRows').appendChild(row);
 }

@@ -31,6 +31,8 @@ public class SecurityConfig {
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         // para travar também a edição da documentação, descomente:
                         // .requestMatchers(HttpMethod.PUT, "/documentacao").hasRole("ADMIN")
+                        // edição de filmes e setups: somente administrador
+                        .requestMatchers(HttpMethod.PUT, "/editarFilme", "/editarSetup").hasRole("ADMIN")
                         .anyRequest().permitAll())
                 .exceptionHandling(e -> e
                         .authenticationEntryPoint((req, res, ex) -> {

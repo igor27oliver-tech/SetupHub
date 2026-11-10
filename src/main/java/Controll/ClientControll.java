@@ -44,6 +44,16 @@ public class ClientControll {
       return registerNewFilme.registerNewFilme(filmeDTO);
     }
 
+    @PutMapping ("/editarFilme")
+    public FilmeResponse editarFilme (@RequestParam Long idFilme, @RequestBody RegisterNewFilmeDTO filmeDTO){
+      return registerNewFilme.editarFilme(idFilme, filmeDTO);
+    }
+
+    @PutMapping ("/editarSetup")
+    public FilmeResponse editarSetup (@RequestParam Long idSetup, @RequestBody RegisterNewSetup setupDTO){
+      return registerNewFilme.editarSetup(idSetup, setupDTO);
+    }
+
     @GetMapping ("/ViewForName")
     public List<ViewForName> listaPorNome() {
         return visualizationFilmeService.getAllViewForName();

@@ -24,4 +24,9 @@ public interface RegistersDeFilmes extends JpaRepository<Filme, Long> {
     // FilmeRepository
     List<Filme> findByTagsFiltersNomeIgnoreCase(String nome);
 
+    // usados para impedir filme repetido (mesmo código na mesma máquina)
+    boolean existsByCodigoMaterialIgnoreCaseAndMaquina(String codigoMaterial, Integer maquina);
+
+    boolean existsByCodigoMaterialIgnoreCaseAndMaquinaAndIdNot(String codigoMaterial, Integer maquina, Long id);
+
 }
